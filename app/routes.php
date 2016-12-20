@@ -14,28 +14,28 @@ Route::get('tweets', function() {
 });
 
 Route::get('tweets/{id}', function($id) {
-    $tweet = DB::select('select * from tweets where id = :id', ['id' => $id]);
+    $tweet = DB::select('select * from tweets where id = :id', ['id' => $id])[0];
 	return json_encode($tweet);
 })
-->where('id', '[0-9]+');;
+->where('id', '[0-9]+');
 
 Route::get('users', function() {
     $users = DB::select('select * from users');
 	return json_encode($users);
 });
 
-Route::get('users/{id}', function($id) {
-    $user = DB::select('select * from users where id = :id', ['id' => $id]);
+Route::get('users/{username}', function($username) {
+    $user = DB::select('select * from users where name = :username', ['username' => $username])[0];
 	return json_encode($user);
 })
-->where('id', '[0-9]+');;
+->where('id', '[0-9]+');
 
 Route::post('users/follow/{id}', function($id) {
 
 })
-->where('id', '[0-9]+');;
+->where('id', '[0-9]+');
 
 Route::post('users/unfollow/{id}', function($id) {
 
 })
-->where('id', '[0-9]+');;
+->where('id', '[0-9]+');
