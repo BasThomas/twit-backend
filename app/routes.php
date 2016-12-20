@@ -1,7 +1,7 @@
 <?php
 
-Route::post('tweets/create', function() {
-	
+Route::post('tweets/create', function($authorID, $content, $timestamp) {
+	DB::insert('insert into tweets (authorID, content, timestamp) values (?, ?, ?)', [$authorID, $content, $timestamp]);
 });
 
 Route::get('tweets', function() {
