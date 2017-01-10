@@ -27,8 +27,13 @@ Route::get('users', function() {
 Route::get('users/{username}', function($username) {
     $user = DB::select('select * from users where name = :username', ['username' => $username])[0];
 	return json_encode($user);
-})
-->where('id', '[0-9]+');
+});
+
+Route::get('users/{username}/tweets', function($username) {
+    $user = DB::select('select * from users where name = :username', ['username' => $username])[0];
+    $tweets = DB::select('SELECT t.id as tweetID, u.id as userID, t.content, t.timestamp, u.name, u.location, u.website, u.bio, u.avatar FROM tweets AS t, users AS u where authorID = :authorID', ['authorID' => $user->id]);
+	return json_encode($tweets);
+});
 
 Route::post('users/follow/{id}', function($id) {
 
