@@ -47,21 +47,31 @@ Route::get('users/{username}/tweets/latest', function($username) {
 });
 
 Route::get('users/{username}/followers', function($username) {
-    $followers = DB::select('SELECT u.* FROM users AS u, following AS f WHERE f.followedID = u.id AND u.name != :username', ['username' => $username]);
+	$user = DB::select('select * from users where name = :username', ['username' => $username])[0];
+    $followers = DB::select('SELECT u.* FROM users AS u, following AS f WHERE f.followedID = :userID AND u.name != :username', ['username' => $username, 'userID' => $user->id]);
 	return json_encode($followers);
 });
 
 Route::get('users/{username}/following', function($username) {
-    $following = DB::select('SELECT u.* FROM users AS u, following AS f WHERE f.followerID = u.id AND u.name != :username', ['username' => $username]);
+	$user = DB::select('select * from users where name = :username', ['username' => $username])[0];
+    $following = DB::select('SELECT u.* FROM users AS u, following AS f WHERE f.followerID = :userID AND u.name != :username', ['username' => $username, 'userID' => $user->id]);
 	return json_encode($following);
 });
 
-Route::post('users/{username}/follow/{id}', function($id) {
+Route::post('users/{username}/follow/{id}', function($username, $id) {
+	$me = DB::select('select * from users where name = :username', ['username' => $username])[0]->id;
+	DB::insert('INSERT INTO following VALUES (:me, :them)', ['me' => $me, 'them' => $id]);
 
+	return 'ok';
 })
 ->where('id', '[0-9]+');
 
-Route::post('users/{username}/unfollow/{id}', function($id) {
+Route::post('users/{username}/unfollow/{id}', function($username, $id) {
+	$me = DB::select('select * from users where name = :username', ['username' => $username])[0]->id;
+	$res = DB::delete('DELETE FROM following WHERE followerID = :me AND followedID = :them', ['me' => $me, 'them' => $id]);
 
+	if ($res != 1) {
+		DB::select('select * from users where id = -3');
+	}
 })
 ->where('id', '[0-9]+');
