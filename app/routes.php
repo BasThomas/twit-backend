@@ -29,15 +29,20 @@ Route::get('users/{username}', function($username) {
 	return json_encode($user);
 });
 
+Route::get('users/{username}/timeline', function($username) {
+    $tweets = DB::select('SELECT t.id as tweetID, t.authorID as userID, t.content, t.timestamp, u.name, u.location, u.website, u.bio, u.avatar FROM tweets AS t, following AS f, users AS u WHERE u.name = :username AND u.id = f.followedID AND t.authorID != u.id', ['username' => $username]);
+	return json_encode($tweets);
+});
+
 Route::get('users/{username}/tweets', function($username) {
     $user = DB::select('select * from users where name = :username', ['username' => $username])[0];
-    $tweets = DB::select('SELECT t.id as tweetID, u.id as userID, t.content, t.timestamp, u.name, u.location, u.website, u.bio, u.avatar FROM tweets AS t, users AS u where authorID = :authorID', ['authorID' => $user->id]);
+    $tweets = DB::select('SELECT t.id as tweetID, t.authorID as userID, t.content, t.timestamp, u.name, u.location, u.website, u.bio, u.avatar FROM tweets AS t, users AS u where authorID = :authorID', ['authorID' => $user->id]);
 	return json_encode($tweets);
 });
 
 Route::get('users/{username}/tweets/latest', function($username) {
     $user = DB::select('select * from users where name = :username', ['username' => $username])[0];
-    $tweet = DB::select('SELECT t.id as tweetID, u.id as userID, t.content, t.timestamp, u.name, u.location, u.website, u.bio, u.avatar FROM tweets AS t, users AS u where authorID = :authorID order by timestamp desc', ['authorID' => $user->id])[0];
+    $tweet = DB::select('SELECT t.id as tweetID, t.authorID as userID, t.content, t.timestamp, u.name, u.location, u.website, u.bio, u.avatar FROM tweets AS t, users AS u where authorID = :authorID order by timestamp desc', ['authorID' => $user->id])[0];
 	return json_encode($tweet);
 });
 
