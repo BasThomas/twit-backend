@@ -46,12 +46,22 @@ Route::get('users/{username}/tweets/latest', function($username) {
 	return json_encode($tweet);
 });
 
-Route::post('users/follow/{id}', function($id) {
+Route::get('users/{username}/followers', function($username) {
+    $followers = DB::select('SELECT u.* FROM users AS u, following AS f WHERE f.followedID = u.id AND u.name != :username', ['username' => $username]);
+	return json_encode($followers);
+});
+
+Route::get('users/{username}/following', function($username) {
+    $following = DB::select('SELECT u.* FROM users AS u, following AS f WHERE f.followerID = u.id AND u.name != :username', ['username' => $username]);
+	return json_encode($following);
+});
+
+Route::post('users/{username}/follow/{id}', function($id) {
 
 })
 ->where('id', '[0-9]+');
 
-Route::post('users/unfollow/{id}', function($id) {
+Route::post('users/{username}/unfollow/{id}', function($id) {
 
 })
 ->where('id', '[0-9]+');
