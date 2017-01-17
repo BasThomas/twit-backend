@@ -25,7 +25,7 @@ Route::get('users', function() {
 });
 
 Route::get('users/{username}', function($username) {
-    $user = DB::select('select * from users where name = :username', ['username' => $username])[0];
+    $user = DB::select('select u.avatar, u.bio, u.id AS userID, u.location, u.name, u.role, u.website from users as u where u.name = :username', ['username' => $username])[0];
 	return json_encode($user);
 });
 
