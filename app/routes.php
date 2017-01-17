@@ -36,7 +36,7 @@ Route::get('users/{username}/timeline', function($username) {
 
 Route::get('users/{username}/tweets', function($username) {
     $user = DB::select('select * from users where name = :username', ['username' => $username])[0];
-    $tweets = DB::select('SELECT t.id as tweetID, t.authorID as userID, t.content, t.timestamp, u.name, u.location, u.website, u.bio, u.avatar FROM tweets AS t, users AS u where authorID = :authorID', ['authorID' => $user->id]);
+    $tweets = DB::select('SELECT t.id as tweetID, t.authorID as userID, t.content, t.timestamp, u.name, u.location, u.website, u.bio, u.avatar FROM tweets AS t, users AS u where t.authorID = :authorID AND t.authorID = u.id', ['authorID' => $user->id]);
 	return json_encode($tweets);
 });
 
