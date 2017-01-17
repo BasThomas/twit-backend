@@ -48,13 +48,13 @@ Route::get('users/{username}/tweets/latest', function($username) {
 
 Route::get('users/{username}/followers', function($username) {
 	$user = DB::select('select * from users where name = :username', ['username' => $username])[0];
-    $followers = DB::select('SELECT u.* FROM users AS u, following AS f WHERE f.followedID = :userID AND u.name != :username', ['username' => $username, 'userID' => $user->id]);
+    $followers = DB::select('SELECT u.avatar, u.bio, u.id AS userID, u.location, u.name, u.role, u.website FROM users AS u, following AS f WHERE f.followedID = :userID AND u.id = f.followerID', ['userID' => $user->id]);
 	return json_encode($followers);
 });
 
 Route::get('users/{username}/following', function($username) {
 	$user = DB::select('select * from users where name = :username', ['username' => $username])[0];
-    $following = DB::select('SELECT u.* FROM users AS u, following AS f WHERE f.followerID = :userID AND u.name != :username', ['username' => $username, 'userID' => $user->id]);
+    $following = DB::select('SELECT u.avatar, u.bio, u.id AS userID, u.location, u.name, u.role, u.website FROM users AS u, following AS f WHERE f.followerID = :userID AND u.id = f.followedID', ['userID' => $user->id]);
 	return json_encode($following);
 });
 
