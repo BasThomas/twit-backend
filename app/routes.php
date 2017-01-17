@@ -132,3 +132,16 @@ Route::delete('tweets/{id}', function($id) {
 	}
 })
 ->where('id', '[0-9]+');
+
+Route::put('users/{id}', function($id) {
+	$data = Request::json()->all();
+	$name = $data['name'];
+	$bio = $data['bio'];
+	$location = $data['location'];
+	$site = $data['site'];
+
+	DB::update('UPDATE users SET name = :name, bio = :bio, location = :location, website = :site WHERE id = :id', ['id' => $id, 'name' => $name, 'bio' => $bio, 'location' => $location, 'site' => $site]);
+
+	return 'ok';
+})
+->where('id', '[0-9]+');

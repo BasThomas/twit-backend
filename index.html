@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+<script>
+var app = angular.module('twitter', []);
+app.controller('twitter', function($scope, $http) {
+	$scope.result = "Not determined yet";
+	$scope.id = -1;
+	$scope.getUser = function() {
+        $http
+    .get('http://localhost/backend/public/users/Basthomas')
+    .then(function (response) { 
+    	$scope.id = response.data.userID;
+    	$scope.name = response.data.name;
+    	$scope.bio = response.data.bio;
+    	$scope.location = response.data.location;
+    	$scope.site = response.data.website;
+    });
+    };
+
+    $scope.update = function() {
+    	var req = {
+			method: 'PUT',
+		 	url: 'http://localhost/backend/public/users/'+$scope.id,
+		 	headers: {
+		   		'Content-Type': undefined
+		 	},
+		 	data: {
+		 		name: $scope.name,
+		 		bio: $scope.bio,
+		 		location: $scope.location,
+		 		site: $scope.site
+		 	}
+		}
+        $http(req)
+   		.then(function (response) { $scope.result = response.data });
+    };
+});
+</script>
+<body>
+
+<div ng-app="twitter" ng-controller="twitter">
+
+<button ng-click="getUser()">Get user</button>
+ 
+<p>Profile:</p>
+<p>Name: <input type="text" ng-model="name"></p>
+<p>Bio: <input type="text" ng-model="bio"></p>
+<p>Location: <input type="text" ng-model="location"></p>
+<p>Website: <input type="text" ng-model="site"></p>
+
+<button ng-click="update()">Update</button>
+
+<p>User id: {{ id }}</p>
+<p>Result: {{ result }}</p>
+
+</div>
+
+</body>
+</html>
