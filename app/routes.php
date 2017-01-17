@@ -1,11 +1,39 @@
 <?php
 
+require('Pusher.php');
+
 Route::post('tweets/create', function() {
 	$authorID = Input::get('authorID');
 	$content = Input::get('content');
-	return DB::table('tweets')->insertGetId(
+
+	$id = DB::table('tweets')->insertGetId(
     	['authorID' => $authorID, 'content' => $content]
 	);
+
+	$monitoredHashtags = DB::select('SELECT m.hashtag FROM monitors AS m');
+
+	foreach ($monitoredHashtags as $hashtag) {
+		$tweets = DB::select('SELECT t.id AS tweetID, t.authorID AS userID, t.content, t.timestamp, u.name, u.location, u.website, u.bio, u.avatar FROM monitors AS m, tweets AS t, users AS u WHERE t.authorID = u.id AND t.id = :id AND t.content LIKE :hashtag', ['id' => $id, 'hashtag' => '%#'.$hashtag->hashtag]);
+		$done = 0;
+		foreach ($tweets as $tweet) {
+			if ($done == 0) {
+				$options = array(
+				'cluster' => 'eu',
+				'encrypted' => true
+			);
+			$pusher = new Pusher(
+				'41dfcbcb79b2e3233a9c',
+				'b54098aee8e48d5498ec',
+				'291043',
+				$options
+			);
+			$pusher->trigger($tweet->name, 'hashtag', json_encode($tweet));
+			$done = 1;
+			}
+		}
+	}
+
+	return $id;
 });
 
 Route::get('tweets', function() {
@@ -32,6 +60,24 @@ Route::get('users/{username}', function($username) {
 Route::get('users/{username}/timeline', function($username) {
     $tweets = DB::select('SELECT t.id as tweetID, t.authorID as userID, t.content, t.timestamp, u.name, u.location, u.website, u.bio, u.avatar FROM tweets AS t, following AS f, users AS u WHERE u.name = :username AND u.id = f.followedID AND t.authorID != u.id', ['username' => $username]);
 	return json_encode($tweets);
+});
+
+Route::post('users/{username}/monitors/{hashtag}', function($username, $hashtag) {
+	$user = DB::select('select * from users where name = :username', ['username' => $username])[0];
+    $id = DB::table('monitors')->insertGetId(
+    	['hashtag' => $hashtag, 'userID' => $user->id]
+	);
+
+	return $id;
+});
+
+Route::delete('users/{username}/monitors/remove', function($username) {
+	$user = DB::select('select * from users where name = :username', ['username' => $username])[0];
+    $res = DB::delete('DELETE FROM monitors WHERE userID = :userID', ['userID' => $user->id]);
+
+	if ($res == 1) {
+		return 'ok';
+	}
 });
 
 Route::get('users/{username}/tweets', function($username) {
