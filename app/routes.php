@@ -75,3 +75,11 @@ Route::post('users/{username}/unfollow/{id}', function($username, $id) {
 	}
 })
 ->where('id', '[0-9]+');
+
+Route::delete('tweets/{id}', function($id) {
+	$userID = Input::get('userID');
+	$user = DB::select('SELECT * FROM users WHERE id = :userID AND role = 1 OR role = 2', ['userID' => $userID])[0];
+
+	DB::delete('DELETE FROM tweets where id = :id', ['id' => $id]);
+})
+->where('id', '[0-9]+');
