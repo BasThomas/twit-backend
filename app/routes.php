@@ -42,7 +42,7 @@ Route::get('users/{username}/tweets', function($username) {
 
 Route::get('users/{username}/tweets/latest', function($username) {
     $user = DB::select('select * from users where name = :username', ['username' => $username])[0];
-    $tweet = DB::select('SELECT t.id as tweetID, t.authorID as userID, t.content, t.timestamp, u.name, u.location, u.website, u.bio, u.avatar FROM tweets AS t, users AS u where authorID = :authorID order by timestamp desc', ['authorID' => $user->id])[0];
+    $tweet = DB::select('SELECT t.id as tweetID, t.authorID as userID, t.content, t.timestamp, u.name, u.location, u.website, u.bio, u.avatar FROM tweets AS t, users AS u where t.authorID = :authorID AND t.authorID = u.id order by timestamp desc', ['authorID' => $user->id])[0];
 	return json_encode($tweet);
 });
 
