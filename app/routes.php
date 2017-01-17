@@ -9,7 +9,7 @@ Route::post('tweets/create', function() {
 });
 
 Route::get('tweets', function() {
-	$tweets = DB::select('select * from tweets');
+	$tweets = DB::select('SELECT t.id AS tweetID, t.authorID AS userID, t.content, t.timestamp, u.name, u.location, u.website, u.bio, u.avatar FROM tweets AS t, users AS u WHERE t.authorID = u.id');
 	return json_encode($tweets);
 });
 
@@ -80,6 +80,9 @@ Route::delete('tweets/{id}', function($id) {
 	$userID = Input::get('userID');
 	$user = DB::select('SELECT * FROM users WHERE id = :userID AND role = 1 OR role = 2', ['userID' => $userID])[0];
 
-	DB::delete('DELETE FROM tweets where id = :id', ['id' => $id]);
+	$res = DB::delete('DELETE FROM tweets where id = :id', ['id' => $id]);
+	if ($res == 1) {
+		return 'ok';
+	}
 })
 ->where('id', '[0-9]+');
